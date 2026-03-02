@@ -2,16 +2,19 @@ import { ConflictException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { RegisterDto } from 'src/modules/auth/dto/register.dto';
-import { User } from './schemas/user.schema';
+import { User, UserDocument } from './schemas/user.schema';
 
 @Injectable()
 export class UserService {
-    constructor(@InjectModel(User.name) private UserModel: Model<User>) {}
+    async findByEmail(email: string): Promise<UserDocument | null> {
+        return this.userModel.findOne({ email }).exec();
+    }
+    constructor(@InjectModel(User.name) private userModel: Model<User>) {}
     
     async createUser(registerUserDto: RegisterDto) {
 
         try{
-            return await this.UserModel.create({
+            return await this.userModel.create({
                 fullName: registerUserDto.fullname,
                 email: registerUserDto.email,
                 password: registerUserDto.password,
